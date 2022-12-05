@@ -5,7 +5,7 @@ public class ComputerMonkey {
 	private String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 	private Random random = new Random();
 
-	// O score é calculado de acordo com a selemelhança entre a string e a phrase
+	// O score é calculado de acordo com a semelhança entre a string e a frase
 	private int score(String string, String phrase){ 
 		  int score = 0;
 		  for(int i = 0; i< phrase.length(); i++){ 
@@ -28,7 +28,7 @@ public class ComputerMonkey {
 	
 		
 	public void tryWrite(String phrase){
-		//Gera a primeira frase aleatroria
+		//Gera a primeira frase aleatoria
 		String baseString = generateRandomSequence(phrase.length());
 		int interation = 0;
 
@@ -58,7 +58,7 @@ public class ComputerMonkey {
 					}
 			
 				String stringAux = String.join("", listAux);
-				//Compara se as frase gerada é mais parecida com a frase alvo se for mantém as mudanças.
+				//Compara se a frase gerada é mais parecida com a frase alvo se for mantém as mudanças.
 				if(score(stringAux, phrase) > score(baseString, phrase)){
 					baseString = stringAux;
 				}
