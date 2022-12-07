@@ -1,72 +1,82 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <time.h>
+#include <unistd.h>
+#define NUMBER_OF_COPIES 100
+#define CHANCE 5
 
-char weasel[] = "METHINKS IT IS LIKE A WEASEL";
-char letters[] = "ABCDEFGHIJKL MNOPQRSTUVWXYZ";
-char base_string[] = "";
-
-int score(char* string){
-    int score = 0;
-    for(int i = 0; i < strlen(weasel); i++){
-        if(string[i] == weasel[i]) score += 1;
-    }
-    return score;
+int score(char *string, char *weasel)
+{
+	int score;
+	for (score = 0; *weasel != '\0'; string++, weasel++)
+		score += *string == *weasel;
+	return score;
 }
 
 int random_number(int N) { 
     return (int)rand() % N;
 }
 
-int main(){
-    int iterations = 0, index = 0, probability = 0;
-    //1. Lista com 100 copias da string
-    char lista[100][29] = {};
+void randomize_copy_char(char **string_list, int n_letters, char letters[], int chance){	
+	int i, index;
 
-    srand(time(NULL) + getpid());
-    //Cria string aleatória
-    for(int i = 0; i < 28; i++){
-        int index = random_number(27);
-        char c = letters[index];
-        strncat(base_string, &c, 1);
-    }
+	for (i = 0; (*string_list)[i] != '\0'; i++) {
+		if (random_number(100) < chance) { // 5% de chance
+			index = random_number(n_letters); // escolhe index de caractere aleatorio do alfabeto 
+			// Mesmo caracter passa para o próximo
+			if ((*string_list)[i] == letters[index])
+				index = (index + 1) % n_letters;
+			(*string_list)[i] = letters[index];
+		}
+	}
+}
 
-    //Loop principal, se repete enquanto a frase não é igual    
-    while(strcmp(base_string, weasel) != 0){
-        iterations += 1;
+int main()
+{
+	char letters[] = "ABCDEFGHIJKLMNO PQRSTUVWXYZ", *weasel = "METHINKS IT IS LIKE A WEASEL";
+	char *base_string, *string_list[NUMBER_OF_COPIES];
+	int number_of_letters = strlen(letters), len_weasel = strlen(weasel);
+	int index, current_score, best_score, iterations, i;
 
-        // Preenche a lista com 100 cópias da string
-        for(int i = 0; i < 100; i++){
-            strcpy(lista[i], base_string);
-        }
+	/* Gera seed para a função rand() */
+	srand(time(NULL) + getpid());
+
+    //Gera a string aleatória
+    char string_auxiliar[28];
+	for (i = 0; i < 28; i++)
+		string_auxiliar[i] = letters[random_number(number_of_letters)];
+	string_auxiliar[28] = '\0';
+	base_string = string_auxiliar;
     
-        // LOOP de substituição
-        srand(time(NULL) + getpid());
-        for(int i = 0; i < 100; i++){ // Para cada uma das 100 cópias da string
-            for(int j = 0; j < 29; j++){
-                probability = random_number(100);
-                if(probability > 94){ // 5% de chance
-                    index = random_number(27);
-                    // Se o caractere for igual ou o mesmo do resultado final
-                    // pular para o próximo
-                    if (lista[i][j] == letters[index] || lista[i][j] == weasel[j])
-				        j = (j + 1) % 27;
-                    lista[i][j] = letters[index]; // substitui com letra aleatoria                   
-                }
-            }
-
-            // Se o score for maior que o anterior, substitui
-            if(score(lista[i]) > score(base_string)){
-                if(strlen(lista[i]) < 30){
-                strcpy(base_string, lista[i]);
-                }
-            }
-        } 
-        printf("\n[%s]  | --score: %d\n", base_string, score(base_string));      
+    //Aloca espaço na memória para as 100 cópias da string
+	for (i = 0; i < NUMBER_OF_COPIES; i++){
+		string_list[i] = (char*) malloc((29) * sizeof(char));
     }
-    printf("\nITERACOES: %d", iterations);
 
-    return 0;
+	/* Loop principal */
+	iterations = 0;
+	while(score(base_string, weasel) < 28){ // Se repete enquanto as strings são diferentes
+		best_score = 0;
+		index = 0;
+		iterations++;
+
+		for (i = 0; i < NUMBER_OF_COPIES; i++) {
+			strcpy(string_list[i], base_string); //Copia a string na posição da lista de 100 cópias
+            //Substitui um caractere aleatório da string
+			randomize_copy_char(string_list + i, number_of_letters, letters, CHANCE); 
+
+			// Retorna o score da copia atual
+			current_score = score(string_list[i], weasel);
+            // Se o score atual for maior que o maior score, substitui
+			if (current_score > best_score) {
+				best_score = current_score;
+				index = i; // atribui o index da copia atual
+			}
+		}
+        // substitui a string pela copia no index atribuido
+		strcpy(base_string, string_list[index]);
+		printf("Iteration %d: %s \tScore: %d\n", iterations, base_string, best_score);
+	}
+	return 0;
 }
