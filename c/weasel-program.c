@@ -20,7 +20,6 @@ int random_number(int N) {
 
 void randomize_copy_char(char **string_list, int n_letters, char letters[], int chance){	
 	int i, index;
-
 	for (i = 0; (*string_list)[i] != '\0'; i++) {
 		if (random_number(100) < chance) { // 5% de chance
 			index = random_number(n_letters); // escolhe index de caractere aleatorio do alfabeto 
@@ -47,6 +46,7 @@ int main()
 	for (i = 0; i < 28; i++)
 		string_auxiliar[i] = letters[random_number(number_of_letters)];
 	string_auxiliar[28] = '\0';
+	//AHQNUDCUBQVGVTTNZRJMCOKKAZPI
 	base_string = string_auxiliar;
     
     //Aloca espaço na memória para as 100 cópias da string
@@ -68,15 +68,15 @@ int main()
 
 			// Retorna o score da copia atual
 			current_score = score(string_list[i], weasel);
-            // Se o score atual for maior que o maior score, substitui
+			
 			if (current_score > best_score) {
 				best_score = current_score;
-				index = i; // atribui o index da copia atual
+				index = i; 
 			}
 		}
         // substitui a string pela copia no index atribuido
 		strcpy(base_string, string_list[index]);
-		printf("Iteration %d: %s \tScore: %d\n", iterations, base_string, best_score);
+		printf("Geracao %d: %s \tScore: %d\n", iterations, base_string, best_score);
 	}
 	return 0;
 }

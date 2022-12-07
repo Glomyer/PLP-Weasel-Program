@@ -5,14 +5,14 @@ letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
 base_string = ""
 
 
-def score(string): # calculates string score, from 0 to 28
+def score(string): # calcula o score da string, de 0 a 28
   score = 0
   for i in range(len(weasel)):
     if string[i] == weasel[i]:
       score += 1
   return score
 
-# generates a new random string
+# gera uma nova string aleatória
 for j in range(len(weasel)):
   base_string += random.choice(letters)
 print(f"String base:  {base_string} \t Score:{score(base_string)}")
@@ -36,6 +36,4 @@ while base_string != weasel:
     if score(stringAux) > score(base_string):
       base_string = stringAux
   
-  print(f"Iteration {str(iteration).zfill(2)}: {base_string} \t Score:{score(base_string)}")
-
-
+  print(f"Geração {str(iteration).zfill(2)}: {base_string} \t Score:{score(base_string)}")
